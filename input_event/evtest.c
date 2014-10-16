@@ -294,8 +294,8 @@ int main (int argc, char **argv)
 	int abs[5];
     
 	if (argc < 2) {
-		printf("Usage: evtest /dev/input/eventX/n");
-		printf("Where X = input device number/n");
+		printf("Usage: evtest /dev/input/eventX\n");
+		printf("Where X = input device number\n");
 		return 1;
 	}
 	if ((fd = open(argv[argc - 1], O_RDONLY)) < 0) {
@@ -308,11 +308,11 @@ int main (int argc, char **argv)
 		perror("evtest: can't get version");
 		return 1;
 	}
-	printf("Input driver version is %d.%d.%d/n",version >> 16, (version >> 8) & 0xff, version & 0xff);
+	printf("Input driver version is %d.%d.%d\n",version >> 16, (version >> 8) & 0xff, version & 0xff);
     
     //Get BUS/VENDOR/PRODUCT/VERSION info
 	ioctl(fd, EVIOCGID, id);
-	printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x/n",
+	printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n",
 		id[ID_BUS],
         id[ID_VENDOR],
         id[ID_PRODUCT],
@@ -320,17 +320,17 @@ int main (int argc, char **argv)
 
     //Get Device Name
 	ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-	printf("Input device name: /"%s/"/n", name);
+	printf("Input device name: %s\n", name);
     
     //Get Supported Events
 	memset(bit, 0, sizeof(bit));
 	ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
-	printf("Supported events:/n");
+	printf("Supported events:\n");
 	for (i = 0; i < EV_MAX; i++)
     {
 		if (test_bit(i, bit[0]))
         {
-			printf("  Event type %d (%s)/n", i, events[i] ? events[i] : "?");
+			printf("  Event type %d (%s)\n", i, events[i] ? events[i] : "?");
 			if (!i)
                 continue;
             
@@ -341,7 +341,7 @@ int main (int argc, char **argv)
 				if (test_bit(j, bit[i]))
                 {
                     //printf Event Code
-					printf("    Event code %d (%s)/n", j, names[i] ? (names[i][j] ? names[i][j] : "?") : "?");
+					printf("    Event code %d (%s)\n", j, names[i] ? (names[i][j] ? names[i][j] : "?") : "?");
 					if (i == EV_ABS)
                     {
                         //Get ABS info
@@ -349,7 +349,7 @@ int main (int argc, char **argv)
 						for (k = 0; k < 5; k++)
                         {
 							if ((k < 3) || abs[k])
-								printf("      %s %6d/n", absval[k], abs[k]);
+								printf("      %s %6d\n", absval[k], abs[k]);
                         }
 					}
 				}
@@ -358,13 +358,13 @@ int main (int argc, char **argv)
     }
     
     //Get and print the event
-	printf("Testing ... (interrupt to exit)/n");
+	printf("Testing ... (interrupt to exit)\n");
 	while (1)
     {
         //1. Get the event
 		rd = read(fd, ev, sizeof(struct input_event) * 64);
 		if (rd < (int) sizeof(struct input_event)) {
-			printf("yyy/n");
+			printf("yyy\n");
 			perror("/nevtest: error reading");
 			return 1;
 		}
@@ -375,13 +375,13 @@ int main (int argc, char **argv)
             //SYN event
 			if (ev[i].type == EV_SYN)
             {
-				printf("Event: time %ld.%06ld, -------------- %s ------------/n",
+				printf("Event: time %ld.%06ld, -------------- %s ------------\n",
 					ev[i].time.tv_sec, ev[i].time.tv_usec,
                     ev[i].code ? "Config Sync" : "Report Sync" );
 			}
             else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN))
             {
-				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x/n",
+				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x\n",
 					ev[i].time.tv_sec, ev[i].time.tv_usec,          //time
                     ev[i].type,                                     //type
 					events[ev[i].type] ? events[ev[i].type] : "?",  //type
@@ -391,7 +391,7 @@ int main (int argc, char **argv)
 			}
             else  //Other Event
             {
-				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %d/n",
+				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %d\n",
 					ev[i].time.tv_sec, ev[i].time.tv_usec,          //time
                     ev[i].type,                                     //type
 					events[ev[i].type] ? events[ev[i].type] : "?",  //type
